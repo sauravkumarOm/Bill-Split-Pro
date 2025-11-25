@@ -104,7 +104,7 @@ const Profile = () => {
     }
   };
 
-  const backendUrl = import.meta.env.VITE_API_BASE_URL
+  const backendUrl = 'https://bill-split-pro-backend.onrender.com'
 
   const avatarSrc = userData?.avatarUrl
   ? `${backendUrl}${userData.avatarUrl}`

@@ -10,7 +10,7 @@ const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
  const [avatar, setAvatar] = useState(null);
 
- const backendUrl = import.meta.env.VITE_API_BASE_URL;
+ const backendUrl = 'https://bill-split-pro-backend.onrender.com';
 
  useEffect(()=>{
      const loadAvatar = async ()=>{
