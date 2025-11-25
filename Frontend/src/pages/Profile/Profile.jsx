@@ -104,12 +104,6 @@ const Profile = () => {
     }
   };
 
-  const backendUrl = 'https://bill-split-pro-backend.onrender.com'
-
-  const avatarSrc = userData?.avatarUrl
-  ? `${backendUrl}${userData.avatarUrl}`
-  : null;
-
 
   if (!profile) {
     return (
@@ -120,6 +114,12 @@ const Profile = () => {
   }
 
   const { user: userData, settlements } = profile;
+
+  const backendUrl = "https://bill-split-pro-backend.onrender.com";
+
+  const avatarSrc = userData?.avatarUrl
+    ? `${backendUrl}${userData.avatarUrl}`
+    : null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 py-8 px-4 sm:px-6">
