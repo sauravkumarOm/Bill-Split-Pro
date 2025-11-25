@@ -1,12 +1,29 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/Authcontext";
+import axios from "../api/axiosInstance";
 import { FiLogOut, FiUser, FiMenu, FiX } from "react-icons/fi";
 
 const NavBar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+ const [avatar, setAvatar] = useState(null);
+
+ useEffect(()=>{
+     const loadAvatar = async ()=>{
+      try{
+        const res = await axios.get("/users/me");
+        if(res.data?.user?.avatarUrl){
+          setAvatar(`http://localhost:5000${res.data.user.avatarUrl}`);
+        }
+      }
+      catch(err){
+          console.error("Error loading avatar:", err);
+        }
+     }
+     loadAvatar();
+ }, []);
 
   const handleLogout = () => {
     logout();
@@ -33,7 +50,18 @@ const NavBar = () => {
                 to="/profile"
                 className="flex items-center gap-2 text-gray-700 font-medium hover:text-indigo-600 transition"
               >
-                <FiUser className="text-gray-500" />
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt="avatar"
+                    loading="lazy"
+                    className="w-8 h-8 rounded-full border border-indigo-500 object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 {user.name}
               </Link>
               <button
@@ -84,7 +112,17 @@ const NavBar = () => {
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 font-medium text-sm px-2 py-1 rounded transition"
                 >
-                  <FiUser className="text-indigo-500" /> {user.name}
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt="avatar"
+                      className="w-10 h-10 rounded-full border border-indigo-500 object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center text-base font-bold">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </div>
+                  )} {user.name}
                 </Link>
 
                 {/* Logout */}

@@ -8,12 +8,14 @@ import {
   FiAlertCircle,
   FiCreditCard,
   FiUser,
+  FiCamera
 } from "react-icons/fi";
 
 const Profile = () => {
-  const { user } = useContext(AuthContext);
+  const { user, updateUser } = useContext(AuthContext);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -28,6 +30,36 @@ const Profile = () => {
     };
     fetchProfile();
   }, []);
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+    setUploading(true);
+
+    try {
+      const res = await axios.post("/users/me/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      
+      setProfile(prev => ({
+        ...prev,
+        user: {
+          ...prev.user,
+          avatarUrl: res.data.avatarUrl   
+        }
+      }));
+
+      updateUser({ avatarUrl: res.data.avatarUrl });
+
+    } catch (err) {
+      console.error("Error uploading avatar:", err);
+    } finally {
+      setUploading(false);
+    }
+  }
 
   const handlePayment = async (settlement) => {
     try {
@@ -72,17 +104,6 @@ const Profile = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
-          className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full"
-        />
-      </div>
-    );
-  }
 
   if (!profile) {
     return (
@@ -104,9 +125,47 @@ const Profile = () => {
       >
         {/* Profile Header */}
         <div className="flex flex-col items-center mb-8 text-center">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-tr from-indigo-600 to-blue-500 text-white rounded-full flex items-center justify-center text-4xl sm:text-5xl font-bold shadow-xl">
-            {userData.name?.charAt(0).toUpperCase()}
+          <div className="relative w-28 h-28">
+            {userData.avatarUrl ? (
+              <img
+                src={`http://localhost:5000${userData.avatarUrl}`}
+                alt="Profile"
+                className="w-28 h-28 rounded-full object-cover border-4 border-indigo-600 shadow-lg"
+              />
+            ) : (
+              <div className="w-28 h-28 bg-gradient-to-tr from-indigo-600 to-blue-500 text-white rounded-full flex items-center justify-center text-5xl font-bold shadow-xl">
+                {userData.name?.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            {/* upload button */}
+
+            <label
+              htmlFor="avatar"
+              className="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full shadow-md cursor-pointer hover:bg-indigo-700"
+              title="Change avatar"
+            >
+              <FiCamera size={18} />
+            </label>
+            <input
+              id="avatar"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
+            {uploading && (
+              <div className="absolute inset-0 bg-white/60 rounded-full flex items-center justify-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                  className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full"
+                />
+              </div>
+            )}
+
           </div>
+
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-4">
             {userData.name}
           </h2>
@@ -146,11 +205,10 @@ const Profile = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className={`p-4 sm:p-5 rounded-2xl shadow-md flex flex-col sm:flex-row sm:justify-between sm:items-center border transition-all duration-200 ${
-                    s.status === "Completed"
-                      ? "border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 hover:shadow-green-200/70"
-                      : "border-orange-200 bg-gradient-to-r from-yellow-50 to-orange-50 hover:shadow-orange-200/70"
-                  }`}
+                  className={`p-4 sm:p-5 rounded-2xl shadow-md flex flex-col sm:flex-row sm:justify-between sm:items-center border transition-all duration-200 ${s.status === "Completed"
+                    ? "border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 hover:shadow-green-200/70"
+                    : "border-orange-200 bg-gradient-to-r from-yellow-50 to-orange-50 hover:shadow-orange-200/70"
+                    }`}
                 >
                   <div className="mb-3 sm:mb-0">
                     <p className="font-semibold text-slate-800 text-base sm:text-lg flex items-center gap-1">
@@ -158,11 +216,10 @@ const Profile = () => {
                       {s.from} → {s.to}
                     </p>
                     <p
-                      className={`text-sm mt-1 flex items-center gap-1 ${
-                        s.status === "Completed"
-                          ? "text-green-600"
-                          : "text-orange-600"
-                      }`}
+                      className={`text-sm mt-1 flex items-center gap-1 ${s.status === "Completed"
+                        ? "text-green-600"
+                        : "text-orange-600"
+                        }`}
                     >
                       {s.status === "Completed" ? (
                         <FiCheckCircle className="text-green-500" />

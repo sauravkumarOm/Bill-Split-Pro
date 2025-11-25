@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "../../api/axiosInstance";
 import { AuthContext } from "../../context/Authcontext";
@@ -6,12 +6,20 @@ import { useNavigate, Link } from "react-router-dom";
 import SliderLoader from "../../components/Loading/SliderLoader";
 
 const Login = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue , formState: { errors } } = useForm();
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(()=>{
+    const savedUser = localStorage.getItem("user");
+    if(savedUser){
+      const userObj = JSON.parse(savedUser);
+      setValue("email", userObj.email);
+    }
+  }, [setValue]);
 
   const onSubmit = async (data) => {
     setLoading(true);
