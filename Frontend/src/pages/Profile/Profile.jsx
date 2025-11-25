@@ -43,12 +43,12 @@ const Profile = () => {
       const res = await axios.post("/users/me/avatar", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      
+
       setProfile(prev => ({
         ...prev,
         user: {
           ...prev.user,
-          avatarUrl: res.data.avatarUrl   
+          avatarUrl: res.data.avatarUrl
         }
       }));
 
@@ -104,6 +104,12 @@ const Profile = () => {
     }
   };
 
+  const backendUrl = import.meta.env.VITE_API_BASE_URL
+
+  const avatarSrc = userData?.avatarUrl
+  ? `${backendUrl}${userData.avatarUrl}`
+  : null;
+
 
   if (!profile) {
     return (
@@ -128,7 +134,7 @@ const Profile = () => {
           <div className="relative w-28 h-28">
             {userData.avatarUrl ? (
               <img
-                src={`http://localhost:5000${userData.avatarUrl}`}
+                src={avatarSrc}
                 alt="Profile"
                 className="w-28 h-28 rounded-full object-cover border-4 border-indigo-600 shadow-lg"
               />

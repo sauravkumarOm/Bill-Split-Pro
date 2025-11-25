@@ -10,12 +10,14 @@ const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
  const [avatar, setAvatar] = useState(null);
 
+ const backendUrl = import.meta.env.VITE_API_BASE_URL;
+
  useEffect(()=>{
      const loadAvatar = async ()=>{
       try{
         const res = await axios.get("/users/me");
         if(res.data?.user?.avatarUrl){
-          setAvatar(`http://localhost:5000${res.data.user.avatarUrl}`);
+          setAvatar(`${backendUrl}${res.data.user.avatarUrl}`);
         }
       }
       catch(err){
