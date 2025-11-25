@@ -107,8 +107,8 @@ const Profile = () => {
 
   if (!profile) {
     return (
-      <div className="flex justify-center items-center min-h-screen text-red-500 bg-gradient-to-br from-red-50 to-pink-50">
-        Failed to load profile.
+      <div className="flex justify-center items-center min-h-screen  bg-gradient-to-br">
+        loading
       </div>
     );
   }
